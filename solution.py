@@ -3,17 +3,13 @@ from socket import *
 import sys # In order to terminate the program
 
 def webServer(port=13331):
-    serverSocket = socket(AF_INET, SOCK_STREAM)
 
-    #Prepare a sever socket
-    serverSocket.bind(("", port))
-    #Fill in start
-    serverSocket.listen(1)
-    print ('the web server is up on port:', port)
-    #Fill in end
 
     while True:
         #Establish the connection
+        serverSocket = socket(AF_INET, SOCK_STREAM)
+        serverSocket.bind(("", port))
+        serverSocket.listen(1)
         print('Ready to serve...')
         connectionSocket, addr = serverSocket.accept() #Fill in start      #Fill in end
         try:
