@@ -9,7 +9,7 @@ def webServer(port=13331):
     serverSocket.bind(("", port))
     #Fill in start
     serverSocket.listen(1)
-    print 'the web server is up on port:', port
+    print ('the web server is up on port:', port)
     #Fill in end
 
     while True:
@@ -18,11 +18,11 @@ def webServer(port=13331):
         connectionSocket, addr = serverSocket.accept() #Fill in start      #Fill in end
         try:
             message = connectionSocket.recv(1024) #Fill in start    #Fill in end
-            print message,'::',message.split()[0],':',message.split()[1]
+            print (message,'::',message.split()[0],':',message.split()[1])
             filename = message.split()[1]
             f = open(filename[1:])
             outputdata = f.read()#Fill in start     #Fill in end
-            print outputdata
+            print (outputdata)
             #Send one HTTP header line into socket
             #Fill in start
             connectionSocket.send('\nHTTP/1.1 200 OK\n\n')
@@ -31,7 +31,7 @@ def webServer(port=13331):
 
             #Send the content of the requested file to the client
             connectionSocket.close()
-            
+
         except IOError:
             #Send response message for file not found (404)
             #Fill in start
