@@ -14,7 +14,7 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     clientSocket.connect((mailserver, port))
     # Fill in end
 
-    #recv = clientSocket.recv(1024).decode()
+    recv = clientSocket.recv(1024).decode()
     #print(recv)
     #if recv[:3] != '220':
         #print('220 reply not received from server.')
@@ -31,7 +31,7 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     # Fill in start
     MAILFROM = 'Mail from<xugeegeegee@gmail.com>\r\n'
     clientSocket.send(MAILFROM.encode())
-    mail_response = clientSocket.recv(1024).decode()
+    #mail_response = clientSocket.recv(1024).decode()
     #print(mail_response)
     # Fill in end
 
