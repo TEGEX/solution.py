@@ -31,8 +31,8 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     # Fill in start
     MAILFROM = 'Mail from<xugeegeegee@gmail.com>\r\n'
     clientSocket.send(MAILFROM.encode())
-    #mail_response = clientSocket.recv(1024).decode()
-    #print(mail_response)
+    mail_response = clientSocket.recv(1024).decode()
+    print(mail_response)
     # Fill in end
 
     # Send RCPT TO command and print server response.
