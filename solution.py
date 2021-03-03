@@ -31,17 +31,11 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     # Fill in start
     MAILFROM = 'Mail from<xugeegeegee@gmail.com>\r\n'
     clientSocket.send(MAILFROM.encode())
-    mail_response = clientSocket.recv(1024).decode()
+    recv = clientSocket.recv(1024).decode()
     #print(mail_response)
     # Fill in end
     
-    # Send DATA command and print server response.
-    # Fill in start
-    data = 'DATA\r\n'
-    clientSocket.send(data.encode())
-    data_resp = clientSocket.recv(1024).decode()
-    #print("After DATA command: " + data_resp)
-    # Fill in end
+  
   
     # Send RCPT TO command and print server response.
     # Fill in start
@@ -52,7 +46,13 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     # Fill in end
 
     
-    
+    # Send DATA command and print server response.
+    # Fill in start
+    data = 'DATA\r\n'
+    clientSocket.send(data.encode())
+    data_resp = clientSocket.recv(1024).decode()
+    #print("After DATA command: " + data_resp)
+    # Fill in end
     
 
    # Send message data.
