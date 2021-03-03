@@ -26,14 +26,6 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     #print(recv1)
     #if recv1[:3] != '250':
        # print('250 reply not received from server.')
-
-    # Send QUIT command and get server response.
-    # Fill in start
-    quit = 'QUIT\r\n'
-    clientSocket.send(quit.encode())
-    recv1 = clientSocket.recv(1024).decode()
-    # Fill in end
-        
         
     # Send MAIL FROM command and print server response.
     # Fill in start
@@ -52,6 +44,11 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     #print("After RCPT TO command: " + rcpt_resp)
     # Fill in end
 
+    # Send message data.
+    # Fill in start
+    clientSocket.send(msg.encode())
+    # Fill in end
+    
     # Send DATA command and print server response.
     # Fill in start
     data = 'DATA\r\n'
@@ -60,12 +57,15 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     #print("After DATA command: " + data_resp)
     # Fill in end
 
-    # Send message data.
-    # Fill in start
-    clientSocket.send(msg.encode())
-    # Fill in end
+   
 
-    
+    # Send QUIT command and get server response.
+    # Fill in start
+    quit = 'QUIT\r\n'
+    clientSocket.send(quit.encode())
+    recv1 = clientSocket.recv(1024).decode()
+    # Fill in end
+        
     # Message ends with a single period.
     # Fill in start
     clientSocket.send(endmsg.encode())
