@@ -61,18 +61,19 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     #clientSocket.send(msg.encode())
     # Fill in end
 
+  
+        
+    # Message ends with a single period.
+    # Fill in start
+    #clientSocket.send(endmsg.encode())
+    # Fill in end
+
     # Send QUIT command and get server response.
     # Fill in start
     quit = 'QUIT\r\n'
     clientSocket.send(quit.encode())
     recv1 = clientSocket.recv(1024).decode()
     # Fill in end
-        
-    # Message ends with a single period.
-    # Fill in start
-    clientSocket.send(endmsg.encode())
-    # Fill in end
-
     
 
 
