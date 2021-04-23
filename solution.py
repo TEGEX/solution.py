@@ -4,6 +4,7 @@ import sys
 import struct
 import time
 import select
+import socket
 import binascii
 # Should use stdev
 
