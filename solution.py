@@ -1,10 +1,10 @@
-from socket import *
+
 import os
 import sys
 import struct
 import time
-import select
 import socket
+import select
 import binascii
 # Should use stdev
 
@@ -49,24 +49,32 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         recPacket, addr = mySocket.recvfrom(1024)
 
         # Fill in start
-        type, code, checksum, id, seq = struct.unpack('bbHHh', recPacket[20:28])
+        icmpHeader = recPacket[20:28]
+        # print('icmpHeader= ', icmpHeader)
+        struct_format = "bbHHh"
+        unpacked_data = struct.unpack(struct_format, icmpHeader)
+        # print("unpacked_data= ", unpacked_data)
+        type, code, checksum, temp_id, seq = struct.unpack('bbHHh', icmpHeader)
+        # print('type=', type, 'code=', code, 'checksum=', checksum, 'temp_id=', temp_id, 'seq=', seq)
         if type != 0:
             return 'expected type=0, but got {}'.format(type)
         if code != 0:
-            return 'expected code=0, but got {}'.format(code)
-        if ID != id:
+            return 'expected code=0, but go {}'.format(code)
+        if ID != temp_id:
             return 'expected id={}, but got {}'.format(ID, id)
-        send_time,  = struct.unpack('d', recPacket[28:])
-        
+        send_time, = struct.unpack('d', recPacket[28:])
+        # print('send_time=', send_time, 'timeReceived=', timeReceived)
         rtt = (timeReceived - send_time) * 1000
-       
-
-        ip_header = struct.unpack('!BBHHHBBH4s4s' , recPacket[:20])
+        ip_header = struct.unpack('!BBHHHBBH4s4s', recPacket[:20])
+        # print('ip_header = ', ip_header)
         ttl = ip_header[5]
         saddr = socket.inet_ntoa(ip_header[8])
         length = len(recPacket) - 20
-
-        return '{} bytes from {}: icmp_seq={} ttl={} time={:.3f} ms'.format(length, saddr, seq, ttl, rtt)
+        timeLeft = timeLeft - howLongInSelect
+        if timeLeft <= 0:
+            return "Request timed out."
+        # return 'Reply from {}: bytes={} time={:.7f}ms TTL={}'.format(saddr, length, rtt, ttl)
+        return (saddr, length, rtt, ttl)
         # Fill in end
         timeLeft = timeLeft - howLongInSelect
         if timeLeft <= 0:
@@ -88,9 +96,9 @@ def sendOnePing(mySocket, destAddr, ID):
 
     if sys.platform == 'darwin':
         # Convert 16-bit integers from host to network  byte order
-        myChecksum = htons(myChecksum) & 0xffff
+        myChecksum = socket.htons(myChecksum) & 0xffff
     else:
-        myChecksum = htons(myChecksum)
+        myChecksum = socket.htons(myChecksum)
 
 
     header = struct.pack("bbHHh", ICMP_ECHO_REQUEST, 0, myChecksum, ID, 1)
@@ -103,9 +111,9 @@ def sendOnePing(mySocket, destAddr, ID):
     # which can be referenced by their position number within the object.
 
 def doOnePing(destAddr, timeout):
-    icmp = getprotobyname("icmp")
+    icmp = socket.getprotobyname("icmp")
     # SOCK_RAW is a powerful socket type. For more details:   http://sockraw.org/papers/sock_raw
-    mySocket = socket(AF_INET, SOCK_RAW, icmp)
+    mySocket = socket(socket.AF_INET, socket.SOCK_RAW, icmp)
 
     myID = os.getpid() & 0xFFFF  # Return the current process i
     sendOnePing(mySocket, destAddr, myID)
@@ -116,7 +124,7 @@ def doOnePing(destAddr, timeout):
 
 def ping(host, timeout=1):
     # timeout=1 means: If one second goes by without a reply from the server,  	# the client assumes that either the client's ping or the server's pong is lost
-    dest = gethostbyname(host)
+    dest = socket.gethostbyname(host)
     print("Pinging " + dest + " using Python:")
     print("")
     # Calculate vars values and return them
