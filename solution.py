@@ -35,6 +35,12 @@ def checksum(string):
 
 
 def receiveOnePing(my_socket, ID, timeout, dest_addr):
+    global rtt_min, rtt_max, rtt_sum, rtt_cnt
+    rtt_min = float('+inf')
+    rtt_max = float('-inf')
+    rtt_sum = 0
+    rtt_cnt = 0
+    cnt = 0
     timeLeft = timeout
     while 1:
         startedSelect = time.time()
@@ -62,6 +68,10 @@ def receiveOnePing(my_socket, ID, timeout, dest_addr):
         send_time, = struct.unpack('d', recPacket[28:])
         # print('send_time=', send_time, 'timeReceived=', timeReceived)
         rtt = (timeReceived - send_time) * 1000
+        rtt_cnt += 1
+        rtt_sum += rtt
+        rtt_min = min(rtt_min, rtt)
+        rtt_max = max(rtt_max, rtt)
         ip_header = struct.unpack('!BBHHHBBH4s4s', recPacket[:20])
         # print('ip_header = ', ip_header)
         ttl = ip_header[5]
@@ -123,19 +133,23 @@ def doOnePing(destAddr, timeout):
 
 
 def ping(host, timeout=1):
+    cnt = 0
     # timeout=1 means: If one second goes by without a reply from the server,  	# the client assumes that either the client's ping or the server's pong is lost
     dest = socket.gethostbyname(host)
     print("Pinging " + dest + " using Python:")
-    print("")
-    # Calculate vars values and return them
-    #  vars = [str(round(packet_min, 2)), str(round(packet_avg, 2)), str(round(packet_max, 2)),str(round(stdev(stdev_var), 2))]
-    # Send ping requests to a server separated by approximately one second
-    for i in range(0,4):
-        delay = doOnePing(dest, timeout)
-        print(delay)
-        time.sleep(1)  # one second
+    try:
+        while True:
+            cnt += 1
+            print (doOnePing(dest, timeout))
+            time.sleep(1)
+    except KeyboardInterrupt:
+        if cnt != 0:
+            print ('--- {} ping statistics ---'.format(host))
+            print ('{} packets transmitted, {} packets received, {:.1f}% packet loss'.format(cnt, rtt_cnt, 100.0 - rtt_cnt * 100.0 / cnt))
+            if rtt_cnt != 0:
+                print ('round-trip min/avg/max {:.3f}/{:.3f}/{:.3f} ms'.format(rtt_min, rtt_sum / rtt_cnt, rtt_max))
 
-    return vars
 
 if __name__ == '__main__':
     ping("google.co.il")
+    
