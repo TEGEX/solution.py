@@ -1,9 +1,8 @@
-
+import socket
 import os
 import sys
 import struct
 import time
-import socket
 import select
 import binascii
 # Should use stdev
@@ -49,32 +48,9 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         recPacket, addr = mySocket.recvfrom(1024)
 
         # Fill in start
-        icmpHeader = recPacket[20:28]
-        # print('icmpHeader= ', icmpHeader)
-        struct_format = "bbHHh"
-        unpacked_data = struct.unpack(struct_format, icmpHeader)
-        # print("unpacked_data= ", unpacked_data)
-        type, code, checksum, temp_id, seq = struct.unpack('bbHHh', icmpHeader)
-        # print('type=', type, 'code=', code, 'checksum=', checksum, 'temp_id=', temp_id, 'seq=', seq)
-        if type != 0:
-            return 'expected type=0, but got {}'.format(type)
-        if code != 0:
-            return 'expected code=0, but go {}'.format(code)
-        if ID != temp_id:
-            return 'expected id={}, but got {}'.format(ID, id)
-        send_time, = struct.unpack('d', recPacket[28:])
-        # print('send_time=', send_time, 'timeReceived=', timeReceived)
-        rtt = (timeReceived - send_time) * 1000
-        ip_header = struct.unpack('!BBHHHBBH4s4s', recPacket[:20])
-        # print('ip_header = ', ip_header)
-        ttl = ip_header[5]
-        saddr = socket.inet_ntoa(ip_header[8])
-        length = len(recPacket) - 20
-        timeLeft = timeLeft - howLongInSelect
-        if timeLeft <= 0:
-            return "Request timed out."
-        # return 'Reply from {}: bytes={} time={:.7f}ms TTL={}'.format(saddr, length, rtt, ttl)
-        return (saddr, length, rtt, ttl)
+
+        # Fetch the ICMP header from the IP packet
+
         # Fill in end
         timeLeft = timeLeft - howLongInSelect
         if timeLeft <= 0:
@@ -112,8 +88,10 @@ def sendOnePing(mySocket, destAddr, ID):
 
 def doOnePing(destAddr, timeout):
     icmp = socket.getprotobyname("icmp")
+
+
     # SOCK_RAW is a powerful socket type. For more details:   http://sockraw.org/papers/sock_raw
-    mySocket = socket(socket.AF_INET, socket.SOCK_RAW, icmp)
+    mySocket = socket.socket(socket.AF_INET, socket.SOCK_RAW, icmp)
 
     myID = os.getpid() & 0xFFFF  # Return the current process i
     sendOnePing(mySocket, destAddr, myID)
@@ -139,3 +117,4 @@ def ping(host, timeout=1):
 
 if __name__ == '__main__':
     ping("google.co.il")
+    
