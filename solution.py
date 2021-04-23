@@ -49,11 +49,13 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
 
         # Fill in start
         # Fetch the ICMP header from the IP packet
-        ICMPHeader = recPacket[20:28]
-      
+        icmpHeader = recPacket[20:28]
+        # print('icmpHeader= ', icmpHeader)
         struct_format = "bbHHh"
-        unpacked_data = struct.unpack(struct_format, ICMPHeader)
-        type, code, checksum, temp_id, seq = struct.unpack('bbHHh', ICMPHeader)
+        unpacked_data = struct.unpack(struct_format, icmpHeader)
+        # print("unpacked_data= ", unpacked_data)
+        type, code, checksum, temp_id, seq = struct.unpack('bbHHh', icmpHeader)
+        # print('type=', type, 'code=', code, 'checksum=', checksum, 'temp_id=', temp_id, 'seq=', seq)
         if type != 0:
             return 'expected type=0, but got {}'.format(type)
         if code != 0:
@@ -61,16 +63,18 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         if ID != temp_id:
             return 'expected id={}, but got {}'.format(ID, id)
         send_time, = struct.unpack('d', recPacket[28:])
-       
-        RTT = (timeReceived - send_time) * 1000
+        # print('send_time=', send_time, 'timeReceived=', timeReceived)
+        rtt = (timeReceived - send_time) * 1000
         ip_header = struct.unpack('!BBHHHBBH4s4s', recPacket[:20])
-        TTL = ip_header[5]
+        # print('ip_header = ', ip_header)
+        ttl = ip_header[5]
         saddr = socket.inet_ntoa(ip_header[8])
         length = len(recPacket) - 20
         timeLeft = timeLeft - howLongInSelect
         if timeLeft <= 0:
             return "Request timed out."
-        return (saddr, length, RTT, TTL)
+        # return 'Reply from {}: bytes={} time={:.7f}ms TTL={}'.format(saddr, length, rtt, ttl)
+        return (saddr, length, rtt, ttl)
         # Fill in end
         timeLeft = timeLeft - howLongInSelect
         if timeLeft <= 0:
