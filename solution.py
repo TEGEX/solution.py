@@ -50,8 +50,9 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         # Fill in start
         ICMPHeader = recPacket[20:28]
         icmpType, code, checksum, packetID, sequence = struct.unpack("bbHHh", ICMPHeader)
-        IPheader = recPacket[8:9]
-        TTL = struct.unpack("B", IPheader)# Print ping results
+        rawTTL = struct.unpack("s", bytes([recPacket[8]]))[0]
+        TTL = int(binascii.hexlify(rawTTL), 16)
+
         if packetID == ID:
             byte = struct.calcsize("d")
             timeSent = struct.unpack("d", recPacket[28:28 + byte])[0]
@@ -94,8 +95,6 @@ def sendOnePing(mySocket, destAddr, ID):
 
 def doOnePing(destAddr, timeout):
     icmp = getprotobyname("icmp")
-
-
     # SOCK_RAW is a powerful socket type. For more details:   http://sockraw.org/papers/sock_raw
     mySocket = socket(AF_INET, SOCK_RAW, icmp)
 
