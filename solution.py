@@ -34,21 +34,17 @@ def checksum(string):
 
 
 
-def receiveOnePing(mySocket, ID, timeout, destAddr):
+def receiveOnePing(my_socket, ID, timeout, dest_addr):
     timeLeft = timeout
-
     while 1:
         startedSelect = time.time()
-        whatReady = select.select([mySocket], [], [], timeLeft)
+        whatReady = select.select([my_socket], [], [], timeLeft)
         howLongInSelect = (time.time() - startedSelect)
-        if whatReady[0] == []:  # Timeout
+        if not whatReady[0]:  # Timeout
             return "Request timed out."
-
         timeReceived = time.time()
-        recPacket, addr = mySocket.recvfrom(1024)
-
+        recPacket, addr = my_socket.recvfrom(1024)
         # Fill in start
-
         # Fetch the ICMP header from the IP packet
         icmpHeader = recPacket[20:28]
         # print('icmpHeader= ', icmpHeader)
@@ -76,6 +72,7 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
             return "Request timed out."
         # return 'Reply from {}: bytes={} time={:.7f}ms TTL={}'.format(saddr, length, rtt, ttl)
         return (saddr, length, rtt, ttl)
+        # Fill in end
         # Fill in end
         timeLeft = timeLeft - howLongInSelect
         if timeLeft <= 0:
