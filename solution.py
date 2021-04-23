@@ -54,7 +54,7 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         TTL = struct.unpack("B", IPheader)# Print ping results
         if packetID == ID:
             byte = struct.calcsize("d")
-            timeSent = struct.unpack("d", recPacket(28:28 + byte))[0]
+            timeSent = struct.unpack("d", recPacket[28:28 + byte])[0]
         return "Reply from %s: bytes=%d time=%f5ms TTL=%d" % (destAddr, len(recPacket), (timeReceived - timeSent)*1000, TTL[0])
 
         # Fill in end
