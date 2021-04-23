@@ -58,10 +58,7 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         send_time,  = struct.unpack('d', recPacket[28:])
         
         rtt = (timeReceived - send_time) * 1000
-        rtt_cnt += 1
-        rtt_sum += rtt
-        rtt_min = min(rtt_min, rtt)
-        rtt_max = max(rtt_max, rtt)
+       
 
         ip_header = struct.unpack('!BBHHHBBH4s4s' , recPacket[:20])
         ttl = ip_header[5]
